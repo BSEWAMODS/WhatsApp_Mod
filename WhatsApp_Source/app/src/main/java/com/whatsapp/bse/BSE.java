@@ -38,18 +38,18 @@ public class BSE {
         }
 	
 	public static String getAndroidID(String str) {
-        try {
-            String android_id = getStringPriv("android_id1");
-            if (!android_id.equals("")) {
-                return android_id;
+            try {
+                  String android_id = getStringPriv("android_id1");
+                  if (!android_id.equals("")) {
+                        return android_id;
+                   }
+                  android_id = Long.toHexString(new SecureRandom().nextLong());
+                  setStringPriv("android_id1", android_id);
+                  return android_id;
+              } catch (Exception e) {
+                    return str;
             }
-            android_id = Long.toHexString(new SecureRandom().nextLong());
-            setStringPriv("android_id1", android_id);
-            return android_id;
-        } catch (Exception e) {
-            return str;
-        }
-    }
+          }
 
     static void showToast(String textoToast){
       Toast.makeText(ctx, textoToast, 0).show();
