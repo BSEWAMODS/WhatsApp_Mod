@@ -19,23 +19,23 @@ public class BSE {
 	public static String installationStr = "com.android.vending";
 	public static String packageName = "com.whatsapp";
 
-    public static void onCreate(Application application) {
-        ctx=application.getApplicationContext();
-    }
+    	public static void onCreate(Application application) {
+              ctx=application.getApplicationContext();
+    	}
 	
 	static SharedPreferences getSharedPreferences(Context contexto) {
-        return contexto.getSharedPreferences(contexto.getPackageName() + "_privacy", 0);
-    }
+              return contexto.getSharedPreferences(contexto.getPackageName() + "_privacy", 0);
+    	}
 	
 	static String getStringPriv(String cadena) {
-        return getSharedPreferences(ctx).getString(cadena, "");
-    }
+              return getSharedPreferences(ctx).getString(cadena, "");
+        }
 	
 	static void setStringPriv(String str, String str2) {
-        Editor editp = getSharedPreferences(ctx).edit();
-        editp.putString(str, str2);
-        editp.apply();
-    }
+              Editor editp = getSharedPreferences(ctx).edit();
+              editp.putString(str, str2);
+              editp.apply();
+        }
 	
 	public static String getAndroidID(String str) {
         try {
