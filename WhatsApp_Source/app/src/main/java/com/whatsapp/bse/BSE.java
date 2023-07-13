@@ -1,5 +1,8 @@
 package com.whatsapp.bse;
 
+import android.view.Menu;
+import android.view.SubMenu;
+import android.view.MenuItem;
 import android.app.Application;
 import android.content.Context;
 import android.widget.Toast;
@@ -13,55 +16,132 @@ import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences;
 import java.security.SecureRandom;
 import android.os.Environment;
+import com.whatsapp.HomeActivity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 
 public class BSE {
 	static Context ctx;
 	public static String installationStr = "com.android.vending";
-	public static String packageName = "com.whatsapp";
-
-    	public static void onCreate(Application application) {
-              ctx=application.getApplicationContext();
-    	}
 	
-	static SharedPreferences getSharedPreferences(Context contexto) {
-              return contexto.getSharedPreferences(contexto.getPackageName() + "_privacy", 0);
-    	}
+	//Metodos de privacidad
+	public static boolean antiViewOnce(){
+		return getPrivacyB("AntiViewOnce");
+	}
 	
-	static String getStringPriv(String cadena) {
-              return getSharedPreferences(ctx).getString(cadena, "");
-        }
 	
-	static void setStringPriv(String str, String str2) {
-              Editor editp = getSharedPreferences(ctx).edit();
-              editp.putString(str, str2);
-              editp.apply();
-        }
-	
-	public static String getAndroidID(String str) {
-            try {
-                  String android_id = getStringPriv("android_id1");
-                  if (!android_id.equals("")) {
-                        return android_id;
-                   }
-                  android_id = Long.toHexString(new SecureRandom().nextLong());
-                  setStringPriv("android_id1", android_id);
-                  return android_id;
-              } catch (Exception e) {
-                    return str;
-            }
-          }
-
-    static void showToast(String textoToast){
-      Toast.makeText(ctx, textoToast, 0).show();
+	//Submenu de privacidad
+	public static void subMenuPrivacy(final Menu menu) {
+        SubMenu agregarSubMenu = menu.addSubMenu(1, 0, 0, "Privacy");
+        agregarSubMenu.add(2, 629638012, 0, strAntiViewOnce());
     }
 	
+	//Textos del sub-Menu
+	static String strAntiViewOnce(){
+		if(getPrivacyB("AntiViewOnce")){
+			return "Disable Anti-View once";
+		}
+		return "Enable Anti-View once";
+    }
+	
+	public static void selectedItem(final HomeActivity homeActivity, final MenuItem menuItem){
+		switch (menuItem.getItemId()){
+			case 629638012:
+				valueChange(homeActivity, "AntiViewOnce");
+				return;
+			default:
+				return;
+		}
+	}
+	
+    //Otros codigos
+    public static void onCreate(Application application) {
+        ctx=application.getApplicationContext();
+    }
+	
+	static SharedPreferences getSharedPreferences(Context contexto) {
+        return contexto.getSharedPreferences(contexto.getPackageName() + "_privacy", 0);
+    }
+	
+	public static void valueChange(final HomeActivity homeActivity, String key){
+		if (getPrivacyB(key)) {
+			setPrivacyB(key, false, homeActivity);
+			RestartApp(homeActivity);
+			return;
+		}
+		setPrivacyB(key, true, homeActivity);
+		RestartApp(homeActivity);
+		return;
+	}
+	
+	static void RestartApp(final Context context) {
+        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(AlarmManager.RTC, 100L + System.currentTimeMillis(), PendingIntent.getActivity(context, 123456, context.getPackageManager().getLaunchIntentForPackage(context.getPackageName()), PendingIntent.FLAG_CANCEL_CURRENT));
+        System.exit(0);
+    }
+	
+	
+	//Metodos para obtener valores de las preferencias
+	static boolean getPrivacyB(String str) {
+        return getSharedPreferences(ctx).getBoolean(str, false);
+    }
+	
+	static void setPrivacyB(String str, boolean z, Context context) {
+        Editor editp = getSharedPreferences(context).edit();
+        editp.putBoolean(str, z);
+        editp.apply();
+    }
+	
+	static String getStringPriv(String cadena) {
+        return getSharedPreferences(ctx).getString(cadena, "");
+    }
+	
+	static void setStringPriv(String str, String str2) {
+        Editor editp = getSharedPreferences(ctx).edit();
+        editp.putString(str, str2);
+        editp.apply();
+    }
+    
+	//Obtener ID'S de los recursos
+	static int getResID(String nombreRecurso, String tipoRecurso){
+		return ctx.getResources().getIdentifier(nombreRecurso, tipoRecurso, ctx.getPackageName());
+	}
+	
+	static int getDrawableID(String nombreRecurso){
+		return getResID(nombreRecurso, "drawable");
+	}
+    
+    
+	//Obtener Android Id
+	public static String getAndroidID(String str) {
+        try {
+            String android_id = getStringPriv("android_id1");
+            if (!android_id.equals("")) {
+                return android_id;
+            }
+            android_id = Long.toHexString(new SecureRandom().nextLong());
+            setStringPriv("android_id1", android_id);
+            return android_id;
+        } catch (Exception e) {
+            return str;
+        }
+    }
+
+    //Mostrar un mensaje emergente
+    static void showToast(String textoToast){
+		Toast.makeText(ctx, textoToast, 0).show();
+    }
+    
+    
+	//Activar las características ocultas
 	public static boolean enableFeatures(int valor){
 		if(valor == 1825 || valor == 1863 || valor == 2434 || valor == 3140 || valor == 3223 || valor == 3289 || valor == 3354 || valor == 3792 || valor == 3931 || valor == 3935 || valor == 4023 || valor == 4268 || valor == 4460 || valor == 4168 || valor == 3844){
 			return true;
 		}
 		return false;
 	}
-
+	
+	
+    //Descargar archivos de ver una vez
     public static void downloadFilesViewOnce(File archivo_entrada) {
         try {
             if (isSaved(archivo_entrada)) {
@@ -126,4 +206,8 @@ public class BSE {
 			return null;
         }
     }
+	
+	public static int getDownloadIcon(){
+		return getDrawableID("btn_download");
+	}
 }
